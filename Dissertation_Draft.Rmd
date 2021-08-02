@@ -1,0 +1,1111 @@
+--- 
+title: "Assessing the utility of ESSENCE data for informing public health decisions" 
+subtitle: "Allison Kunerth, MS, PSM"
+author: 
+- "A Dissertation Presented to the Graduate Faculty of"
+- "Saint Louis University in Partial Fulfilment"
+- "of the Requirements for the Degree of"
+- "Doctor of Philosophy"
+date: "2021"
+knit: bookdown::render_book
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+always_allow_html: true
+fontsize: 12pt
+linestretch: 1.5
+toc-depth: 1
+secnumdepth: 1
+geometry: "left=4cm, right=3cm, top=2.5cm, bottom=2.5cm"
+link-citations: yes
+github-repo: akunerth/Dissertation_Draft.git
+description: "This is a the current draft of my dissertation."
+
+# The next two lines allow you to change the spacing in your thesis. You can 
+# switch out \onehalfspacing with \singlespacing or \doublespacing, if desired.
+header-includes:
+    - \usepackage{setspace}\onehalfspacing
+# This will automatically install the {remotes} package and {thesisdown}
+# Change this to FALSE if you'd like to install them manually on your own.
+params:
+  'Install needed packages for {thesisdown}': True
+# Remove the hashtag to specify which version of output you would like.
+# Can only choose one at a time.
+#output:
+ # thesisdown::thesis_pdf: default 
+#  thesisdown::thesis_gitbook: default         
+#  thesisdown::thesis_word: default
+#  thesisdown::thesis_epub: default
+# If you are creating a PDF you'll need to write your preliminary content 
+# (e.g., abstract, acknowledgements) below or use code similar to line 25-26 
+# for the .RMD files. If you are NOT producing a PDF, delete or silence
+# Specify the location of the bibliography below
+bibliography: bib/references.bib
+# Download your specific csl file and refer to it in the line below.
+csl: bib/apa-6th-edition.csl
+lot: true
+lof: true
+biblio-style: apalike
+---
+
+# Preliminary Pages {-} 
+
+```{r include_packages, include=FALSE}
+# This chunk ensures that the thesisdown package is
+# installed and loaded. This thesisdown package includes
+# the template files for the thesis.
+if (!require(remotes)) {
+  if (params$`Install needed packages for {thesisdown}`) {
+    install.packages("remotes", repos = "https://cran.rstudio.com")
+  } else {
+    stop(
+      paste('You need to run install.packages("remotes")",
+            "first in the Console.')
+    )
+  }
+}
+if (!require(thesisdown)) {
+  if (params$`Install needed packages for {thesisdown}`) {
+    remotes::install_github("ismayc/thesisdown")
+  } else {
+    stop(
+      paste(
+        "You need to run",
+        'remotes::install_github("ismayc/thesisdown")',
+        "first in the Console."
+      )
+    )
+  }
+}
+library(thesisdown)
+# Set how wide the R output will go
+options(width = 70)
+```
+
+```{r echo = FALSE, message=FALSE, warning=FALSE}
+#install.packages("bookdown")
+#install.packages("webshot")
+#webshot::install_phantomjs()
+# or the development version
+# devtools::install_github("rstudio/bookdown")
+library(bookdown)
+#library(webshot)
+```
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown'
+), 'packages.bib')
+```
+
+## List of Abbreviations and Terms {-}
+
+```{r Abbreviations, echo = FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(kableExtra)
+
+data_frame(
+  Term = c("Biosense", "Centers for Disease Control and Prevention", "Code of State Regulations", "Critical Access Hospitals", "Department of Health and Human Services", "Digital Divide Index", "Early Event Detection", "Ebola Virus Disease", "Electronic Health Records", "Electronic Medical Records", "Electronic Surveillance System for the Early Notification of Community Based Epidemics", "Emergency Department / Emergency Room", "Federal Communications Commission", "Full-Time Equivalents", "H1N1","Health Information Systems", "Health Information Technology", "Health Level-7", "Influenza-like-Illness", "Influenza-like-Illness Surveillance Network", "Influenza", "International Classification of Disease", "Local Public Health Agency", "Meaningful Use","Moran’s I", "National Notifiable Diseases Surveillance System", "National Syndromic Surveillance Program", "Over-the-Counter", "Personally Identifiable Information", "Promoting Interoperability Program", "Sexually Transmitted Diseases", "Situational Awareness", "Statistical Analysis System", "Surveillance", "Syndrome", "Syndromic Surveillance", "United States"),
+  Abbreviation = c(" ", "CDC", "CSR", "CAHs", "DHHS", "DDI", "EED", "EVD", "EHRs", "EMR", "ESSENCE", "ED/ER", "FCC", "FTE"," ", "HIS", "HIT", "HL7", "ILI", "ILINet", " ", "ICD", "LPHA", "MU", " ", "NNDSS", "NSSP", "OTC", "PII", "PI", "STDs", "SA", "SAS", " ", " ", " ", "U.S."),
+  Definition = c(" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "," ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ")) %>%
+  arrange(Term) %>% # i.e. alphabetical order by Term
+  kable(booktab = T) # booktab = T gives us a pretty APA-ish table
+```
+
+<!--chapter:end:index.Rmd-->
+
+## Copyright Page {-}
+
+(c) Copyright by <br>
+Allison Kay Kunerth <br>
+ALL RIGHTS RESERVED <br>
+2021
+
+<!--chapter:end:00-copyright.Rmd-->
+
+## Committee Page {-}
+
+COMMITTEE IN CHARGE OF CANDIDACY
+
+Profesor Elizabeth Baker, PhD, Chairperson and Advisor<br>
+Associate Professor Michael Elliott, PhD<br>
+Assistant Professor Kevin Syberg, DrPH, MPH<br>
+Former Adjunct Professor Alan Zelicoff, MD<br>
+
+
+\tableofcontents
+
+<!--chapter:end:00.1-committee.Rmd-->
+
+# Introduction {#intro}
+
+## Background
+
+- Pandemics/Disease Impacts
+
+- Disaster Preparedness Cycle
+
+- Mitigation/Preparedness = Surveillance
+
+Biological events, whether naturally or intentionally occurring, can have a dramatic impact on society in both developing and industrialized nations. Whether it is the more familiar threat of influenza, or an emerging infectious disease such as Ebola Virus Disease (EVD), people from all walks of life can be vulnerable to the effects of a biological event. In recent years, society has witnessed pandemic influenza in 2009 which claimed 12,469 lives, and more recently Ebola which claimed 11,325 lives by early 2016, and infected many more.(Sudhakar V. Nuti, 2014; L. Uscher-Pines et al., 2009)  As travel, trade and armed conflict increase globally, the threat of disease will also increase as new routes of transmission become available, and humans are exposed to new and changing environments.(Relman, Institute of, Choffnes, & Mack, 2010) In response, many health professionals have turned their attention towards monitoring and conducting surveillance in order to contain the negative impact of these inevitable events and to help decrease morbidity and mortality.(Buehler, Hopkins, Overhage, Sosin, & Tong, 2004a; Relman et al., 2010)<br>
+
+Communities, many public health departments, some hospitals, and even academic organizations utilize various surveillance systems. Traditional surveillance methods are based on diagnostic confirmation and/or alerts based on high clinical suspicion. These are usually conducted for nationally notifiable conditions to include infectious agents like Tuberculosis or Hepatitis, Bioterrorism agents like botulism and anthrax, non-infectious events such as carbon monoxide or lead poisoning and outbreaks from food or waterborne diseases.("National Notifiable Diseases Surveillance System," 2018) Commonly, agencies will also conduct traditional surveillance for influenza and influenza-like illnesses (ILI), but this is on a voluntary basis with certain exceptions.("Overview of Influenza Surveillance in the United States,") Another method that gained increased interest after the events of 9/11 is syndromic surveillance. Syndromic surveillance differs from traditional laboratory confirmed surveillance in that data is evaluated prior to receipt of a diagnosis; specifically, early symptoms or symptom pre-cursors are evaluated and assigned to a syndrome (i.e. groups or categories) in order to detect anomalies that may be indicative of an outbreak.(Henning, 2004a; Jean-Paul Chretien, 2009) By attempting to identify clusters, trends in symptoms or other indicative factors such as absenteeism, or increased over-the-counter (OTC) medication use, it is possible for outbreaks to be identified sooner than by waiting for laboratory confirmed surveillance data, ultimately leading to increased response time, earlier mobilization of resources and decreased morbidity and mortality.(Buehler et al., 2004a; Henning, 2004a; Robertson, Nelson, MacNab, & Lawson, 2010)<br>
+
+## The Problem
+
+- Data is an important driver of decisions
+
+- Research repeatedly indicates that SS data can/should drive PH decisions, but is often not happening
+
+- Data driven/evidence-informed decision making is highly promoted for surveillance/monitoring programs
+
+- In order for data to inform decisions, data use needs to be improved, which also requires that the system be strengthened
+
+- Strengthening the PH surveillance system and optimizing a user-centered data culture can facilitate greater use of data
+
+- Approaches for assessing utility of surveillance systems are largely unchanged
+
+One system used to conduct syndromic surveillance is the Electronic Surveillance System for the Early Notification of Community Based Epidemics (ESSENCE). This system can be used as a stand-alone product at hospitals and local public health agencies (LPHAs) or as a tool on the cloud-based platform called BioSense hosted by the National Syndromic Surveillance Program (NSSP)-a nationwide effort to promote collaboration and partnerships that can help increase capacity for syndromic surveillance at the local and state level for improved situational awareness and response.(Gould, Walker, & Yoon, 2017)<br>
+
+While use of ESSENCE either on the BioSense platform or as a stand-alone system has been encouraged by the NSSP, it suffers from many of the noted concerns of syndromic surveillance as a whole including: data quality concerns such as a lack of standardization, representativeness and availability of data; interpretation, analysis and visualization of the data; and facilitating the use of data for Early Event Detection (EED) and Situational Awareness (SA). (Buehler, Sonricker, Paladini, Soper, & Mostashari, 2008; R. D. Fricker, Jr., 2011; R. D. Fricker & Rolka, 2006; Gould et al., 2017; Shmueli & Burkom, 2010; Lori Uscher-Pines et al., 2009; Yoon, Ising, & Gunn, 2017) The BioSense platform currently only captures about 55% of all Emergency Department (ED/ER) visits, but with the increased promotion and use of ESSENCE on their platform and the Promoting Interoperability (PI) program (formerly Meaningful Use) requirements, wherein healthcare providers are incentivized to provide data (such as syndromic surveillance or immunizations data) to public health agencies, syndromic surveillance data availability and use is bound to increase, and the aforementioned concerns will need to be addressed.(42 CFR Parts 412, 413, 424, and 495 Medicare Program; Hospital Inpatient Prospective Payment Systems for Acute Care Hospitals and the Long Term Care Hospital Prospective Payment System and Policy CHanges and Fiscal Year 2019 Rates; Quality Reporting Requirements for Specific Providers; Medicare and Medicaid Electronic Health Record (EHR) Incentive Programs (Promoting Interoperability Programs) Requirements for Eligible Hospitals, Critical Access Hospitals, and Eligible Professionals; Medicare Cost Reporting Requirements; and PHysician Certification and Recertification of Claims, 2018; Buehler et al., 2009; Chu et al., 2012; Chughtai, DeVore, Kan, & Streichert, 2016; "Connecting Public Health Information Systems and Health Information Exchange: Lessons from the Field," 2017; Gould et al., 2017; HealthIT.gov, 2017; Henning, 2004b; Hiller, Stoneking, Min, & Rhodes, 2013; Lenert & Sundwall, 2012)<br>
+
+
+## Summary
+
+<!--chapter:end:01-intro.Rmd-->
+
+# Literature Review
+
+## Global Impact of Biosecurity
+- Address impacts and introduce public health surveillance in general
+- Key events, global drivers and role of surveillance
+
+The recurrence of outbreaks globally demonstrates that there is an important interconnectedness between humans, the environment and animals, and in light of disease spread these factors can amplify the spread of disease transmission and fuel the progression of outbreaks.(Office of the Secretary, 2010; Rabinowitz et al., 2013) Disease spread in a community can have devastating effects well beyond the number of casualties sustained. Countries or nations can suffer significant financial damage, and the public’s trust in the medical or public health system can be depleted; which can create lasting public health crises.(Elston et al., 2015; Sachs & Malaney, 2002) Varying incubation periods and clinical presentations also compound the ability to clearly identify a biological event or outbreak in the early stages. When not caught early, disease spread can occur rapidly and be very far reaching by the time clinical symptoms are present.(Buehler et al., 2003; Buehler et al., 2004a)<br>
+
+While disease outbreaks are often naturally occurring, biological events can also be intentional, such as what was witnessed shortly after 9/11 with the Anthrax attack delivered via the postal service, targeted towards government officials.(Richard A. Goodman MD, 2012) Since this attack, the public has increasingly realized both the magnitude and potential for a biological attack and has accordingly placed higher expectations on the public health community.(Richard A. Goodman MD, 2012) In response to these higher expectations, funding as well as research for bioterrorism and emerging bioterrorism threats, has steadily increased since 2001 when the annual biodefense budget was $414 million compared to the now FY 2019 budget which allocates $13.60 billion for health security.(Boddie, Sell, & Watson, 2015; Schuler, 2004; Watson, Watson, Gastfriend, & Sell, 2018)<br>
+
+Health security generally encompasses biodefense programs, radiological and nuclear programs, chemical programs, pandemic influenza and emerging infectious disease programs, and multiple-hazard and preparedness programs.(Boddie et al., 2015; Hughes & Gerberding, 2002)  Biosecurity specifically focuses on the protection of humans, animals and the environment from environmental threats.(Meyerson & Reaser, 2002) Collectively these programs all support security efforts to reduce vulnerability and ultimately risk, particularly within the context of bioterrorism. Without mitigating this risk, both a naturally occurring and intentional biological event could be a disaster. With this in mind, many public health systems have taken a proactive approach to mitigate these risks by monitoring the state of disease in their communities so that they can intervene at the earliest opportunity. This is important, because if public health systems are ill equipped to handle the expected, then it is unlikely they will be prepared to handle the unexpected.<br> 
+
+## Traditional Public Health Surveillance
+The main goal of public health surveillance is to prevent and control disease, and is a cornerstone to public health practice. ("Glossary," 2011; Thacker, Qualters, Lee, Centers for Disease, & Prevention, 2012) In order to better prepare their local communities for various public health threats, most public health agencies collect, analyze and interpret health related data on a daily basis. (Porta & International Epidemiological Association., 2008) Commonly, this is accomplished through the use of laboratory data and physician reporting, with a focus on disease prevalence and detection in local communities but can also be conducted for all-hazards threats (inclusive of all hazards or threats that could reasonable cause injury, property damage or disruption) as well. (Buehler et al., 2003; Jean-Paul Chretien, 2009)  By using public health surveillance systems and technology, public health practitioners can monitor health events and/or behaviors and compare what is currently occurring to what is expected based on previous or historical data.(Buehler, Hopkins, Overhage, Sosin, & Tong, 2004b; Nsubuga et al., 2006) When aberrancies occur it can suggest the need for an investigation or further analysis, but not all alerts necessarily indicate a serious problem. It is often the individuals at LPHAs themselves that help make the judgment call on what constitutes a concern, and which actions should be taken in light of an aberrancy. This reliance on a human-centered step and relying not just data, but the integration of experience, subject matter expertise and an understanding of the current situation to reach a conclusion is an important consideration for surveillance as a whole-presenting both advantages and disadvantages.<br>
+
+	 In order to prevent and control disease, public health agencies conduct surveillance (or what will be referred to as traditional surveillance), which is a process where data is collected once it has been confirmed or there is high clinical suspicion. Certain infectious and noninfectious diseases are mandated as reportable to public health agencies, that in turn work with local sites of care to determine how those cases are reported, and then forward the pertinent information to the Centers for Disease Control and Prevention (CDC). These diseases are a part of the National Notifiable Diseases Surveillance System (NNDSS) which monitors and helps public health agencies control and reduce the negative impact of approximately 120 diseases to include infectious, noninfectious and emerging diseases.("National Notifiable Diseases Surveillance System," 2018) Diseases can range from lead poisoning to E.coli outbreaks, Sexually Transmitted Diseases (STD’s) or cases of Zika.("National Notifiable Diseases Surveillance System," 2018)<br>
+	 
+While these systems are necessary they are not always sufficient. For many diseases, the best surveillance occurs when vigilance and clinical surveillance is high, in that the frontline health care workers are often the best chance of catching anomalous cases, particularly novel or rare diseases such as Ebola. (Woolhouse, Rambaut, & Kellam, 2015) If all goes well, they not only detect the disease, order the correct test and accurately diagnose the individual, but they also quickly report their findings to public health agencies. This has worked well in a few cases, such as the early identification of an arboviral encephalitis outbreak in New York during 1999, or the swift testing and identification of inhalational anthrax after the mail attacks in 2001. (Bush, Abrams, Beall, & Johnson, 2001; Centers for Disease & Prevention, 1999) But a delay or misdiagnosis can have dire consequences, such as what was exhibited with the first U.S. case of Ebola in 2014 or commonly with highly infectious diseases, such as measles.(Gahr et al., 2014; Upadhyay, Sittig, & Singh, 2014) Even if a clinician quickly identifies the disease, there is often a time lagin reporting.(Jajosky & Groseclose, 2004) Many reportable diseases are also subject to diagnostic tests (i.e. laboratory testing or cultures) that can take time, and are reliant on a number of human-processed steps. The clinician not only has to order the correct test, the sample must also be processed accurately, and upon confirmation of a diagnosis must be reported. Some disease reporting is automated and electronic, but some rely on physically calling or faxing the local health department. This requires the health department to then also process the report and add it to their own system, which can create a lag in public health action for the disease of concern.(Johnson, Williams, Lee, & Bradley, 2014) Other problems that can occur with traditional surveillance methodology include insensitivity, in that true positives (i.e. cases) are missed while false positives may be flagged as anomalous erroneously, as well as timeliness-wherein the data is not available or communicated fast enough to impact public health actions.(Jean-Paul Chretien, 2009)<br>
+
+A disease commonly under surveillance is annual influenza or influenza-like illness (ILI). The CDC operates an Influenza Division (under the Epidemiology and Prevention Branch) which focuses on the year-round compilation of data on influenza activity across the United States, ultimately producing FluView and FluView Interactive which are weekly reports of influenza activity and a data exploration tool for influenza surveillance respectively.("Overview of Influenza Surveillance in the United States,") They have five categories of influenza surveillance; virologic surveillance, outpatient illness surveillance-collected through the U.S. Outpatient Influenza-like Illness Surveillance Network (ILINet), mortality surveillance, hospitalization surveillance (i.e. FluSurv-NET) and the summary of the geographic spread of influenza.("Overview of Influenza Surveillance in the United States,") Collectively, these five categories of ILI surveillance should provide a comprehensive national picture of influenza activity, but the levels of reporting in each of these categories is not uniform. ILINet, one of the more commonly utilized data sources, is reported nationally by the Department of Health and Human Services (DHHS), but not all states choose to release their state-level data and the FluSurv-NET, which is used for influenza-related hospitalizations, is only reported to from a limited amount of geographic areas. Most importantly, one of the biggest challenges with ILI surveillance is that all influenza activity reporting is voluntary.("Overview of Influenza Surveillance in the United States,") This means that it is possible that not all regions have data representative of what is actually occurring in their communities due to some providers not reporting ILI activity, and with data compiled weekly there is often a requested submission deadline for inclusion in the FluView analysis. With no requirements or incentives to report ILI, it is likely that this deadline is not always met, which could affect the quality of the data exhibited in the weekly influenza reports distributed by FluView.(Hopkins et al., 2017) With the noted challenges of traditional surveillance methods, public health officials have continued to work towards improving the early detection of diseases and outbreaks through other means, particularly syndromic surveillance.<br>
+
+
+## Syndromic Surveillance
+- Evolution of Syndromic Surveillance
+- Concerns and issues with Syndromic Surveillance
+
+Syndromic surveillance has evolved as a new strategy to help respond to the growing public demand that the public health system to do more to anticipate, detect and respond to outbreaks. (Buehler et al., 2004a; Hughes & Gerberding, 2002; Jean-Paul Chretien, 2009)  Syndromic surveillance is the use of pre-diagnostic data to identify illness clusters in near real time to detect public health events in order to mobilize a rapid response and reduce morbidity and mortality.(Samoff et al., 2012),(May, Chretien, & Pavlin, 2009),(Henning, 2004a) By evaluating symptoms, the hope is that syndromic surveillance can identify an outbreak faster than conventional surveillance efforts which could involve waiting for diagnostic confirmation with laboratory tests. Syndromic surveillance has been considered a public health priority since 1998 when the CDC announced a plan to handle emerging infectious diseases.(Smolinski, Hamburg, Lederberg, & Institute of, 2003) Even though there were a number of instances that reinforced the necessity of syndromic surveillance including the West Nile Virus outbreak in 1999, it wasn’t until 2001 when 9/11 and the anthrax attacks occurred that there was an emphasis on increasing the utilization of syndromic surveillance.(Food & Drug Administration, 2010) While initially syndromic surveillance efforts were focused on bioterrorism, by 2011 it transitioned to being applicable for all-hazards preparedness and response, including influenza.(Yoon et al., 2017)<br>
+
+Data from physicians’ offices and mid-level practitioners, as well as emergency departments are particularly well suited for syndromic surveillance, since they are often electronically stored, available in a timely fashion, and are in a form amenable to syndromic grouping.(Mandl et al., 2004) This health data can also come from hospitals, urgent cares, poison control, or even via proxies for health data such as over-the-counter (OTC) medication sales and absenteeism.(Berger, Shiau, & Weintraub, 2006; Thacker et al., 2012) Most health related data is classified by International Classification of Disease (ICD) codes or chief complaints, and both have shown promise with their potential to be grouped into applicable syndromes.(Berger et al., 2006; Mandl et al., 2004) This pre-diagnostic data can be timelier, but often at the expense of specificity, meaning that it may provide a more broad description of what is occurring in local communities without necessarily a narrow case definition.(Bravata et al., 2004) Therefore, many institutions monitor more than one source of data but this can often lead to difficulty with interpretation due to semantic and temporal relationships between the data, as well as varying levels of accuracy and reliability.(Buckeridge et al., 2002) Syndromic surveillance success can be achieved when systems are calibrated correctly with enough sensitivity, yet enough specificity to minimize false alarms, but are also dependent on the population dispersion of those affected, syndrome definition, size of the outbreak and clinician reporting.(Henning, 2004a; Jean-Paul Chretien, 2009)<br>
+
+While research has been limited, syndromic surveillance has been found to detect ILI faster than traditional surveillance methods in some studies. Most of these studies have used retrospective designs where there is a well-defined syndrome definition, population base and reporting structure, as well as with locally developed systems using ED cases. (Brownstein & Mandl, 2006; Marsden-Haug et al., 2007) While these findings have shown positive results, they have not been able to reliably demonstrate one of the core functions of syndromic surveillance, early event detection (EED). Because of limited evidence demonstrating the reliability of these syndromic surveillance systems for early event detection, many have transitioned away from using syndromic surveillance for early event detection and instead use it primarily for situational awareness (SA). Examples include annual ILI surveillance and situational awareness for other events, such as noncommunicable disease monitoring to include heat related illness, investigating food-poisoning cases and the monitoring of large gatherings or events for illness or injuries.(Jean-Paul Chretien, 2009; Stephens;)<br>
+
+*MEANINGFUL USE AND THE PROMOTING INTEROPERABILITY PROGRAM*<br>
+A program that may influence the use of syndromic surveillance data is the Promoting Interoperability (PI) program, formerly known as the Electronic Health Record (EHR) Incentive Program and Advancing Care Information.(42 CFR Parts 412, 413, 424, and 495 Medicare Program; Hospital Inpatient Prospective Payment Systems for Acute Care Hospitals and the Long Term Care Hospital Prospective Payment System and Policy CHanges and Fiscal Year 2019 Rates; Quality Reporting Requirements for Specific Providers; Medicare and Medicaid Electronic Health Record (EHR) Incentive Programs (Promoting Interoperability Programs) Requirements for Eligible Hospitals, Critical Access Hospitals, and Eligible Professionals; Medicare Cost Reporting Requirements; and PHysician Certification and Recertification of Claims, 2018) This program was established in 2011 to encourage health professionals and eligible hospitals to demonstrate meaningful use of certified EHR technology. A performance category in the Merit-based Incentive Payment system portion of the program specifically encouraged the use of syndromic surveillance data by eligible hospitals or Critical Access Hospitals (CAH’s) in order to meet the objective for Public Health and Clinical Data Registry Reporting. Both the previous program and the current program (FY19) give hospitals and CAH’s the option of what type of data they will submit to meet this objective, choosing two data sources under the previous program, and three from the current program of the following; Immunization Registry, Syndromic Surveillance, Electronic Case, Clinical Data Registry or Electronic Reportable Laboratory Results Reporting.(42 CFR Parts 412, 413, 424, and 495 Medicare Program; Hospital Inpatient Prospective Payment Systems for Acute Care Hospitals and the Long Term Care Hospital Prospective Payment System and Policy CHanges and Fiscal Year 2019 Rates; Quality Reporting Requirements for Specific Providers; Medicare and Medicaid Electronic Health Record (EHR) Incentive Programs (Promoting Interoperability Programs) Requirements for Eligible Hospitals, Critical Access Hospitals, and Eligible Professionals; Medicare Cost Reporting Requirements; and PHysician Certification and Recertification of Claims, 2018) The proposed ruling for FY2019 originally required reporting of syndromic surveillance data and one other data source, but concerns over some hospitals being unable to send syndromic surveillance data, and some LPHA’s being unable to receive syndromic surveillance data.(42 CFR Parts 412, 413, 424, and 495 Medicare Program; Hospital Inpatient Prospective Payment Systems for Acute Care Hospitals and the Long Term Care Hospital Prospective Payment System and Policy CHanges and Fiscal Year 2019 Rates; Quality Reporting Requirements for Specific Providers; Medicare and Medicaid Electronic Health Record (EHR) Incentive Programs (Promoting Interoperability Programs) Requirements for Eligible Hospitals, Critical Access Hospitals, and Eligible Professionals; Medicare Cost Reporting Requirements; and PHysician Certification and Recertification of Claims, 2018)<br>
+	
+As of 2014, more than 1,500 hospitals sent syndromic surveillance data to public health agencies, yet nationally there are more than 5,000 hospitals, and only 46 states & the District of Columbia (DC) were able to receive syndromic surveillance data under the PI program.(HealthIT.gov, 2017) Currently, Oklahoma, Minnesota, Iowa and parts of Colorado at a minimum, are unable to participate in syndromic surveillance under the PI program, which certainly influences the ability to have fully representative syndromic surveillance nationally.(42 CFR Parts 412, 413, 424, and 495 Medicare Program; Hospital Inpatient Prospective Payment Systems for Acute Care Hospitals and the Long Term Care Hospital Prospective Payment System and Policy CHanges and Fiscal Year 2019 Rates; Quality Reporting Requirements for Specific Providers; Medicare and Medicaid Electronic Health Record (EHR) Incentive Programs (Promoting Interoperability Programs) Requirements for Eligible Hospitals, Critical Access Hospitals, and Eligible Professionals; Medicare Cost Reporting Requirements; and PHysician Certification and Recertification of Claims, 2018) Important to understand is that the program only encourages eligible hospitals and CAH’s to use syndromic surveillance data but does not require it, and the process for submitting the information is dictated by the LPHA. The data does have to be in a standardized format such as HL7, but it is up to the LPHA to determine which platform or process it employs for receiving the data. This means that there are many sites of care that are likely not submitting any syndromic surveillance data to LPHA’s, and that nationally (and possibly regionally or in states) there could be a high level of variability in the reporting and use of syndromic surveillance data.<br>
+
+*EVOLUTION OF SYNDROMIC SURVEILLANCE*<br>
+In 2003, the National Syndromic Surveillance Program (NSSP) was funded by the U.S. Congress to “establish an integrated national public health surveillance system for early detection and rapid assessment of bioterrorism-related events.”(CDC, 2016) It was initially known as the BioSense Program and was built as a singular technology that could serve as a national system for conducting syndromic surveillance. In recent years though, the program goal shifted to “improve nationwide situational awareness and enhance responsiveness to hazardous events and disease outbreaks to protect America’s health, safety, and security,” through the promotion and advancement of a national syndromic surveillance system capable of a timely exchange of syndromic data.(Surveillance, 2016) Through collaborative partnerships, the NSSP aims to foster a collaborative network of individuals and groups with expertise in various aspects of syndromic surveillance and provide access to what is now a cloud-based system called the BioSense Platform. The platform helps public health practitioners to “rapidly collect, evaluate, share, and store syndromic surveillance data… [in order] to analyze syndromic data to improve their common awareness of health threats over time and across regional boundaries.”(Surveillance, 2016) The platform hosts tools, analytics and data such as the Electronic Surveillance System for the Early Notification of Community Based Epidemics (ESSENCE), Statistical Analysis System (SAS) and R Studio Professional that public health practitioners can integrate with their own systems or utilize on the BioSense Platform.("National Syndromic Surveillance Program (NSSP): Biosense Platform-Tools," 2017)<br>
+
+Despite the availability of this cloud-based platform, the most utilized syndromic surveillance system in 2015 was ESSENCE (not used on the BioSense platform) with 27% usage among those conducting syndromic surveillance, with only 12% of syndromic surveillance users utilizing ESSENCE on the Biosense platform.(Chughtai et al., 2016) While ESSENCE is increasingly used in the syndromic surveillance community, either on the BioSense platform or as a stand-alone system at state or LPHA’s, it still suffers from many of the aforementioned concerns of syndromic surveillance as a whole.<br>
+
+*CONCERNS AND ISSUES WITH SYNDROMIC SURVEILLANCE* <br>
+Along with the aforementioned issues regarding syndromic surveillance, research in recent years has also noted other issues and concerns to include; duplicative reporting requirements for health care facilities, LPHA’s, and state agencies, problems with differential data quality and syndromic surveillance being utilized more for situational awareness as opposed to early event detection.(Hopkins et al., 2017; Public Health Surveillance Preparing for the Future; Yoon et al., 2017) Other concerns such as geographic and population influences on the likelihood of syndromic surveillance systems being utilized is also a concern, but not widely explored. A national biosurveillance survey from 2015 found that larger populations (>500k) are more likely to have used syndromic surveillance as compared to populations smaller than 50k, and that only 62% of all LPHA’s have ever used an electronic syndromic surveillance system. This can lead to problems with representativeness in state-wide surveillance systems if there is not uniformity in reporting of syndromic disease threats. It was also reported that 52% of LPHA’s nationally do not have access to syndromic surveillance systems, and those who don’t have access self-reported monetary and staff resources, as well as technical capabilities as the biggest barriers.(Chughtai et al., 2016) The influence of these reported barriers has not yet been explored, and it is unclear whether these types of resource barriers are related to the earlier concerns surrounding rurality. The NSSP recognizes these challenges and has a research agenda focused on informatics, communications, analytics and systems research.(Hopkins et al., 2017)<br>
+
+## Relevant Frameworks
+- WASH, ST, HIT
+
+## Gaps in Knowledge
+
+The findings mentioned above suggest that future work with syndromic surveillance more fully examine the utility of syndromic surveillance for early event detection and situational awareness, assess data quality, and assess the use of syndromic surveillance for public health actions.(Gould et al., 2017) Literature also suggests that it is important to evaluate the function, utility and quality of syndromic surveillance systems across local jurisdictions and in their hierarchical reporting structures. Expanding the geographic regions upon which syndromic surveillance is assessed will not only further our understanding of representativeness and resources, but it will also contribute to better informed response and preparedness actions taken at local public health systems.<br>
+
+## Enhanced Framework
+- Present WASH Framework with modifications
+
+## Research Questions
+
+[**Primary RQ:**](#ref:PrimaryRQ) How is syndromic surveillance data used to inform public health decisions, and how can syndromic surveillance data and systems be improved to better inform those decisions? <br>
+
+[**- RQ1:**](#RQ1) How is ESSENCE data (i.e., syndromic surveillance data) used to inform decisions? <br>
+
+[**- RQ2:**](#ref:RQ2) What influences the use of ESSENCE data for informing public health decisions?
+<br>
+
+[**- RQ3:**](#ref:RQ3) How can the ESSENCE syndromic surveillance data and systems be improved to better inform the use of SS data for public health decisions?{#RQ3}<br>
+
+## Research Hypotheses
+
+## Significance of the Study
+
+<!--chapter:end:02-literature.Rmd-->
+
+# Methods
+
+```{r load-packages, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+library(remotes)
+library(haven)
+library(jose)
+library(openssl)
+library(DT)
+library(janitor)
+library(assertthat)
+library(utf8)
+library(easyGgplot2)
+library(RCurl)
+library(jsonlite)
+library(dplyr)
+library(epiDisplay)
+library(gtsummary)
+library(tidyverse)
+library(urbnmapr)
+library(stringr)
+library(plyr)
+library(readxl)
+```
+
+```{r read in data and clean, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+#Set Working Directory
+setwd("/Users/allisonkunerth/Desktop/Dissertation")
+#Read in Surveillance Survey Data
+SS_Data <- data.frame(read.csv('/Users/allisonkunerth/Desktop/Dissertation/Data/Surveillance_Survey_2.csv'))
+
+#Remove unnecessary columns
+SS_Data <- subset(SS_Data, select = -c(3:10))
+#Remove unnecessary rows
+SS_Data <- SS_Data %>% slice(-c(1,2))
+```
+
+## Introduction
+This chapter describes the research methodology utilized to address the primary research question of, how is syndromic surveillance data used to inform public health decisions, and how can the syndromic surveillance data and systems be improved to better inform those decisions? By utilizing a modified WASH framework (as described in Chapter 2) applied to a statewide syndromic surveillance system in Oregon, this question can be addressed by determining how ESSENCE data is currently and historically used to inform public health decisions and what influences that use (Aim 1); as well as determining what changes can be made to syndromic surveillance data and systems in the state of Oregon to improve the use of this data for informing public health decisions (Aim 2).<br>
+
+## Purpose and Study Design
+The purpose of this research was to assess how syndromic surveillance data is used to inform public health decisions, and how the syndromic surveillance data and systems can be improved to better inform those decisions. To accomplish this, a mixed-methods study design was employed in order to leverage the strengths of both quantitative and qualitative research methodologies. Qualitative research methods are traditionally inductive, and focus on the experiences and narrative of the participants in order to make sense of or interpret phenomena, contribute towards knowledge generation and develop explanations or theories. This type of inquiry is uniquely suited to capturing context, or helping to bring an understanding to how systems function, as well as their dynamics. In contrast, quantitative methods are traditionally deductive, and used to empirically test a hypothesis. When these methods are applied together, both statistics and stories can be elucidated, which in tandem can provide a more robust understanding of the problem at hand.<br>
+
+### Institutional Review Board
+Prior to initiating recruitment or data collection, this project was approved by the Saint Louis University Institutional Review Board (IRB), study #31985. The Oregon Health Authority Public Health IRB also completed a review of the project (PH IRB 20-26) and it was determined that they would not be engaged in the work, and 45 CFR 46 would not be applied. Letters of support were obtained from Lane County Public Health and the OHA ESSENCE program indicating a willingness to assist with recruitment efforts for this project. Participation was voluntary, and participants could choose to withdraw at any time without penalty. Risks to participants was minimal, with personally identifiable information only collected to facilitate contact for the follow-up interview. The possibility of identification due to publicly available employment information and smaller staff sizes was minimized by only reporting aggregate and non-identifiable information.<br>
+
+## Aim 1
+The purpose of Aim 1 was to determine how ESSENCE data is currently and historically used to inform public health decisions, and identify what factors influence that use. This Aim was driven by two research questions, with their associated outcomes and hypotheses listed below.<br>
+
+### RQ1: How is ESSENCE data (i.e., syndromic surveillance data) used to inform decisions?<br> {#RQ1}
+
+*RQ1 Outcomes:*<br>
+  1. Current and historical uses of ESSENCE (both frequency of use and purpose).<br>
+  2. Current and historical use of ESSENCE data for informing public health decisions.<br>
+  3. Current users of ESSENCE data<br>
+
+### RQ2: What influences the use of ESSENCE data for informing public health decisions?<br> {#RQ2}
+
+*RQ2 Outcomes:* <br>
+  1. Identification of factors influencing the use of ESSENCE data for informing public health decisions.<br>
+  2. Identification of other purposes or uses for ESSENCE data, both historically and currently.<br>
+  
+## Aim 2<br>
+The purpose of Aim 2 was to determine what changes can be made to the syndromic surveillance data and systems to improve the use of this data for informing public health decisions. This Aim was driven by one research question, with its associated outcomes and hypotheses listed below.<br> 
+
+### RQ3: How can the ESSENCE syndromic surveillance data and systems be improved to better inform the use of SS data for public health decisions?<br> {#RQ3}
+
+*RQ3 Outcomes:*<br>
+1. Identification of factors influencing ESSENCE data use (both for any purpose and public health decisions).<br>
+2. Identification of factors influencing ESSENCE systems/processes (both for any purpose and public health decisions).<br>
+3. Desired attributes/characteristics of ESSENCE data and systems/processes for public health decisions.<br>
+
+*RQ3 Outcomes:*<br>
+1. Identification of factors influencing ESSENCE data use (both for any purpose and public health decisions).<br>
+2. Identification of factors influencing ESSENCE systems/processes (both for any purpose and public health decisions).<br>
+3. Desired attributes/characteristics of ESSENCE data and systems/processes for public health decisions.<br>
+
+## Population and Sample Size
+The population of interest for this study was personnel currently or previously employed in the state of Oregon by the state or county governments, who had either worked with a surveillance system (traditional and/or syndromic) or had been provided information from a surveillance system as a part of their assigned duties while employed at these agencies. This population was targeted with the intent of capturing perspectives from both personnel who have used ESSENCE, and those who have not used ESSENCE. These varying viewpoints were determined to be important for addressing the research questions in order to obtain a balanced perspective, as well as to identify factors influencing both the use and non-use of ESSENCE data. Personnel willing to participate who self-identified with the aforementioned employment and use of surveillance systems/data criteria, and were at least 18 years of age were eligible to participate. The expected age range was 18-67, but no upper age limit was identified as exclusionary, and the only other exclusionary criteria was the ability to read and write in English since the recruitment and study materials were not translated.<br>
+
+Initial groups of personnel targeted for recruitment included employees at Lane County Public Health (LCPH), ESSENCE system-users statewide within the last 12-months (July 2020-July 2021), and publicly listed employees at the Oregon Health Authority (OHA) and LPHAs across the state in departments or roles likely to utilize surveillance information. LCPH was targeted due to existing relationships, the size of the population served (fourth largest in the state), and to help reach personnel outside the Portland-Metro area. ESSENCE system-users were chosen in order to capture a unique user-group that is critical to this research, and while they are spread across the state—there is a concentration of users in the Portland-Metro area. The list of OHA and LPHA employees was drawn from a search of publicly available information concerning positions held by county or state employees statewide. The titles varied, but departments/programs initially selected included: Epidemiology, Emergency Preparedness, Environmental Health, Immunizations, STI/STD programs, Disease Control and Prevention, Community Health, COVID, Public Health Leadership, and County Commissioners. This review occurred for the entire state of Oregon, which includes 36 counties, 33 Local Public Health Agencies, and 7 response regions.<br>
+
+The initial recruitment strategy employed a snowball sampling methodology wherein those identified to receive an email invitation to participate were encouraged to forward the email to other colleagues or friends who may be eligible. This approach was deemed appropriate to address this research question since there was not a comprehensive list or available means to reach all personnel in the state who use or are informed by surveillance systems, nor a means to reach or efficiently identify previous employees. It was also advantageous in reaching personnel who may not wish to be identified, was cost-effective, and able to be employed quickly.<br>
+
+In selecting personnel to participate in the interview, a stratified sampling methodology was employed. Participants who completed the survey and were willing to share their contact information were selected for participation in the interview by stratification into the seven statewide response regions, and by their status as an ESSENCE user or non-user. Priority was placed on selecting ESSENCE users in each of the regions, and then balancing out responses with non-ESSENCE users. The advantage of this approach is that it helped to improve the representativeness of responses for this study by distributing the participants equally across the state. Disadvantageous though was the fact that distributing responses across the seven response regions did not necessarily account for differences in population served, physical land/space covered or the density of employees in a given region. 
+
+## Survey <br>
+Eligible individuals in the target population were recruited to complete the initial survey to obtain information on their current and historical use of surveillance systems, their experience and education, as well as their attitudes, beliefs and perceptions concerning factors that may influence the use of surveillance systems (both traditional and syndromic). Initial invitations to participate included approximately 100 personnel from LCPH, approximately 200 ESSENCE system-users and 400 employees at OHA and LPHAs statewide for a total initial recruitment effort of approximately 700 personnel. When accounting for duplicates across the three recruitment streams (i.e., personnel appearing on more than one list), the final number was reduced to approximately 500 personnel. An approximate response rate of 30% was anticipated (based on expected response rates for online surveys), which yielded an expected total of 150 participants.  A priori power analyses indicated that there would be adequate power to answer the research questions based on TBD conditions. <br>
+
+## Interview <br>
+Participants for the interview were drawn from those who completed the survey and indicated a willingness to participate in a follow-up interview. Prioritization of participants to complete the interview was based on the aforementioned stratified sampling strategy, and violations made only to improve representativeness. The stratified sampling strategy was employed to achieve the purposive sampling goal to select participants from both the ESSENCE and non-ESSENCE user groups from across the state in a manner which was relatively representative. The ESSENCE users were identified as those who self-identified as doing (or has done) at least one of the following: (1) Accessed and used the ESSENCE data system; (2) Works with ESSENCE data directly to produce reports, conduct analyses etc.; or, (3) Is informed or provided ESSENCE data for decisions or actions. An ESSENCE non-user was identified when participants self-identified as done (or have done) at least one of the following: (1) Accessed and used surveillance systems (traditional or otherwise), but does not use the ESSENCE data system; (2) Works with surveillance data (not ESSENCE) directly to produce reports, conduct analyses etc.; or, (3) Is informed or provided surveillance data (not from ESSENCE) for decisions or actions. In instances where responses are unclear, or a participant appears to indicate that they could belong to both user-groups, they were classified as an ESSENCE user for purposes of interview selection.<br>
+
+With the same assumption as the surveys of a 30% response rate, it was estimated that approximately 45 individuals would indicate a willingness to complete the interview (from those who completed the survey) which would yield approximately 6 responses per each of the seven response regions. The initial target was to complete at least 4 interviews per each of the response regions to achieve approximately 28 total interviews in a heterogenous population, which falls in the recommended sample range for semi-structured qualitative interviews. The desire was to achieve a point of saturation, wherein no new themes were emerging with subsequent interviews.<br>
+
+## Data Collection <br>
+
+### Survey <br>
+Data collection was initiated on TBD date, and lasted through TBD date. An initial TBD personnel were sent an invitation to participate with a link directing them to a survey in Qualtrics. This invite also prompted them to forward the email onto any colleagues that they knew who might be eligible. Upon completion of the survey, they were asked to indicate whether they were interested in participating in a follow-up interview—and if so, directed to a separate Qualtrics link where they could provide their contact information.<br>
+
+The survey was developed by TBD.<br>
+
+  **Section Still in Progress**<br>
+* Participants indicated their willingness to [participate in an interview](#SS.043)
++ Every 48 hrs, responses were collected and emailed either to:
+    1. Notify them they were added to the [list to receive results of the study](#SS.042) and let them know that if they are interested in participating in an interview they can respond to that email; or,<br>
+    2. Invite them to be interviewed, and ask for 2-3 days or times that work within the next week<br>
+  + Once a response was received, participants were scheduled and sent a zoom link<br>
+  + When an email was provided from the [Interview Interest block](#InterviewInterestBlock) respondents were marked as "already responded" and "NA" for all future emails from the *Sent Surveys masterlist*<br>
+* When emailing with an interview invite, participants were added to the *MasterList*, which assigned an ID, and listed their First Name, Last Name, County, Role, Region, User-Type and date of interview<br>
+  + The *MasterList* entries that are complete are published [here](##InterviewResponses), and scheduled ones are stored locally in the same format<br>
+  + Attention was paid to [user-type](#User-Type) and region for appropriate balancing, but currently responses are still balanced and violation considerations haven't occurred yet<br>
+  **Section Still in Progress**
+
+### Interview <br>
+TBD<br>
+
+## Data Analysis <br>
+TBD <br>
+
+### Quantitative Protocol
+
+**1. Surveys were sent to potential respondents<br>**
+
+* A list of potential respondents was created (*Sent Surveys masterlist*) by sourcing publicly available emails from the following sites:<br>
+  + [Local Public Health Authority Directory](https://www.oregon.gov/oha/PH/PROVIDERPARTNERRESOURCES/LOCALHEALTHDEPARTMENTRESOURCES/Pages/lhd.aspx)<br>
+  + [Oregon Health Authority Program Directory](https://www.oregon.gov/oha/PH/PHD/Pages/index.aspx)<br>
+* Lane County Public Health distributed through their listserv (no count/estimate on how many personnel), and the OHA ESSENCE program distributed to 77 users as well<br>
+* The *Sent Surveys masterlist* included the following variables: County, First Name, Last Name, Email, Email Dates, Responded, Declined and Notes<br>
+  + Three email dates were included for each distribution (Initial email, first follow-up at 2-weeks, and last follow-up at 4-weeks)<br>
+* After sending emails, any that were returned were either corrected, or a search conducted for a correct email, and resent. If returned twice, then respondent was removed from the *Sent Surveys masterlist*<br>
+  + Potential respondents who emailed notifications of people they recommended were reached out to, as well as notifications of the survey being further distributed. In either case, these emails were added to the list and contacted by myself, or noted as contacted by other respondents<br>
+* The declination survey was checked every 48 hrs and any indicated responses marked as declined and NA for future emails, as well as any direct email requests/responses<br>
+  
+**2. Initial Review of the Data**
+
+* Publish data and list in [Appendix A-Full Survey results](#SurveyResults)<br>
+* Develop (and then routinely check) cleaning script<br>
+  + Cleaning script removes responses that did not progress after eligibility screening<br>
+  + Will review/consider whether partial responses should be included (likely will include and just have more missing responses later in the survey)<br>
+  + For survey response times, remove outliers (those greater than 60 minutes)<br>
+
+**3. Frequencies and Descriptives**<br>
+
+* Prepare frequencies and distributions (in-progress)<br>
+* Run missing data report by question to see if certain questions have low response rates<br>
+  + Develop/Review strategies to handle missing data<br>
+
+**4. Question assessments by identified Outcomes**<br>
+
+* [RQ 1](#RQ1), Outcome 1: Current and historical uses of ESSENCE (both frequency of use and purpose)<br>
+  + [ESSENCE Block](#ESSENCE-Block), to include free-text responses (code for themes)<br>
+  + Interview Questions: Can you please describe why you used ESSENCE data?Can you please describe why you did not use ESSENCE data?<br>
+
+* [RQ 1](#RQ1), Outcome 2: Current and historical uses of ESSENCE data for informing public health decisions<br>
+  + [ESSENCE Block](#ESSENCE-Block), to include free-text responses (code for themes)<br>
+  + Interview Questions: Can you please describe why you used ESSENCE data?Can you please describe why you did not use ESSENCE data?<br>
+  
+* [RQ 1](#RQ1), Outcome 3: Current users of ESSENCE data<br>
+  + [User-Type Block](#User-Type), [Employment Block](#Employment), [Other Factors Block](#OtherFactors), [Demographics Block](#Demographics)
+  + Could assess against the [Non-ESSENCE Block](#NonEssence) and the [Other Users Block](#OtherUsers) too
+  + Will likely need to do tests of association with the EESSENCE User vs Non-User and User Characteristics (Chi-squared, Point-biserial, Ordinal Regression/OR)<br>
+
+* [RQ 2](#RQ2), Outcome 1: Identification of factors influencing the use of ESSENCE data for informing public health decisions<br>
+  + [Other Users Block](#OtherUsers)
+  + Binomial Logistic Regression to predict Use of ESSENCE for PH Decisions (Will do for each of the 7 types of events, EED and SA)<br> 
+  + Interview Questions: What types of decisions are you typically responsible for, and/or involved with? For these decisions, can you describe which surveillance data sources you usually consider, and why?<br>
+  + Describe any themes identified from free-response/open-ended questions regarding ESSENCE informing decisions or actions<br>
+  
+* [RQ 2](#RQ2), Outcome 2: Identification of other purposes or uses for ESSENCE data, both historically and currently.<br>
+  + Interview Questions: Can you discuss the value of ESSENCE data? Can you discuss what impact ESSENCE data has on these decisions? Can you describe situations where ESSENCE data is most useful? Are there other ways ESSENCE data could be used at your organization?<br>
+
+* [RQ 3](#RQ3), Outcome 1: Identification of factors influencing ESSENCE data use (both for any purpose and public health decisions)
+  + Interview Questions: What factors make ESSENCE data most useful in these situations? In what ways do the systems and processes in your organization promote the use of ESSENCE data? And the use of that data for decisions? Can you discuss the value of these data sources? Can you discuss what impact these data sources have on your decisions? Why and when do you use this data? Awareness? Is this data used regularly, or intermittently? Is it used for specific situations and not others? Can you describe what makes this data most useful? Do you ever consider using ESSENCE data? Why or why not?<br>
+  
+* [RQ 3](#RQ3), Outcome 2: Identification of factors influencing ESSENCE systems/processes (both for any purpose and public health decisions)<br>
+  + Interview Questions: Can you describe your experience using the ESSENCE system itself? In what ways do the systems and processes in your organization discourage the use of ESSENCE data? And the use of that data for decisions? <br>
+
+* [RQ 3](#RQ3), Outcome 3: Desired attributes/characteristics of ESSENCE data and systems/processes for public health decisions <br>
+  + Interview Questions: hat needs to change for ESSENCE data to be used more regularly for decision-making? <br>
+
+**5. Explore relationships**<br>
+
+* TBD<br>
+
+
+### Qualitative Protocol 
+
+Mixed methods research occurs when elements of both quantitative and qualitative research approaches are utilized in order to gain a broader depth of understanding and corroboration [@johnson2007toward].
+
+Semi-structured interviews are commonly used in social-science research, and are appropriate when the researcher desires to capture greater context and richness from the respondents about a particular topic--without constraining their responses. The questions are pre-planned, and open-ended with the respondent given the opportunity to elaborate or give greater explanation with their response [@articlealsaawi2014critical].
+
+For this study, qualitative data was collected through two means:<br>
+(1) Free-text responses in the surveys; and,<br>
+(2) Semi-structured interviews
+
+For the free-text responses.... *TBD*<br>
+
+**Section Still in Progress** *Create wordclouds for initial quality review of free-text responses, as well as general themes<br> Here is one [example](#SS.008). Removed special characters and text: / @ \\|, II, numbers, common english stopwords, and punctuation.Can produce frequency tables with explicit counts by words. Later on will need to assess these more collectively for themes, and how they relate to respondent groupings.* **Section Still in Progress**
+
+For the semi-structured interviews, data was collected via the use of Zoom--a secure videoconferencing platform that would record the full interview and provide automatic transcription. This videoconferencing platform has been noted to be useful for qualitative data collection, and able to provide a more positive user experience, while still allowing for a rapport to be established, and non-verbal cues visualized [@archibald2019using,@articlealsaawi2014critical]. Verbal affirmation of consent was confirmed at the beginning of each session, and participants informed of the recording process. All interviews were both video and audio recorded to the Zoom cloud. Within approximately 15-minutes of completing the interviews, audio transcripts were fully processed and available to the PI.<br>
+
+Efforts were taken to ensure the interview was conducted to rigorous standards, while still conforming to best practices for eliciting responses and ensuring respondents felt comfortable and at ease during the interview process [@Goodenough2012Real,@articlealsaawi2014critical]. Techniques included listening more than speaking, asking short and clear questions, minimizing or eliminating cues, explaining any jargon or terms, allowing the interview to flow naturally and keeping the conversation on topic.<br>
+
+Questions pertaining to the respondents specific [user-type](#User-Type) were asked first (following their description of role, daily tasks and role in decision-making). Priority was placed on asking all of the questions about their [user-type](#User-Type) in the first 20-minutes. Out of respect for their time, after about 20-minutes the respondents were asked if they were willing to continue, and if so--remaining questions asked.<br>
+
+An evaluation of qualitative data first begins with the preparation and cleaning of the raw files into a format that is amenable to close reading and analysis [@lester2020learning]. For this study, this involved the researcher downloading the transcript and removing all references to the name of the respondent. Their name was replaced with a coded ID (i.e., SS001, SS002 etc.), and saved as a new file. This *masterfile* was kept confidential with the PI, and listed the ID, names, position, county, region, [user-type](#User-Type) and date of the interview.<br>
+
+Transcription of the data is also another crucial step in the preparation for analysis, and for this study involved the PI validating the automatic transcription by reviewing the video alongside the transcript within 48-hours of each interview. Corrections were made to the transcript to improve accuracy and reflect the spoken words verbatim. Upon completion of this validation, the video recordings were deleted from the cloud and the transcriptions uploaded into a private project in Dedoose [@Dedoose2018]. Interviews were initially tagged with at least the following: [user-type](#User-Type), region, county, and role. The transcription process was also used to gain increased familiarity with the data and facilitate a closer reading of the text [@lester2020learning,@thomas2006general]. 
+
+Themes are the higher categorizations/generalizations of specific codes, and help to unify the subject of inquiry. It helps give the codes a common point of reference and organizes them in a grouping that can help answer the research questions (@vaismoradi2016theme).
+
+Deductive coding is a common technique in qualitative research that utilizes a pre-defined set of codes or themes to explore the data. It can also be called concept-driven coding, and uses previous research, and the research question to identify themes that are applied to the data (*Source TBD*). For this research, initial themes which aligned to the research questions were chosen. After the close reading and review, initial codes were also generated to assist in the initial review.<be>
+
+During the initial coding review, descriptive codes were applied to all the applicable text segments, recognizing the lower level of inference at this stage of coding. During the second review, the segments of text and the assigned codes were reviewed with a focus on applying more codes as needed, and connecting passages or codes more directly to the research questions. A third pass (if needed) was conducted which took these connections and constructed meaning from them in relation to the research question (@lester2020learning).
+
+|  Relevant RQ     | Potential Themes | Potential Codes|
+|:------           |           :-----             |            :-----|
+| [1](#RQ1)   |   Current and Historical Use  |  EED, SA, Purpose, Event, Frequency |
+| [1](#RQ1)   |   Reason for use or non-use  |  Appropriateness, Accessibility |
+| [2](#RQ2)    |   Influence/Use of ESSENCE data for decisions  |  Appropriateness, Accessibility|
+| [2](#RQ2)   |   Other purposes/Uses of ESSENCE data |  Events, Purposes |
+| [3](#RQ3)   |   Factors influencing ESSENCE data use   |  Organizational, Political, Contextual|
+|  [3](#RQ3)     |   Factors influencing ESSENCE system use  |  Organizational, Political, Contextual           |
+| [3](#RQ3)     |   Desired attributes of ESSENCE data and systems|  Training, education, technical features, staffing, funding |
+
+These themes and specific codes were reviewed with the committee to assess for appropriateness, 
+
+
+**8. Visualize relationships and assess validity<br>**
+
+* Place text into coding matrix and/or a network diagram to explore relationships <br>
+* Assess for corroboration via triangulation <br>
+  + Compare results of quantitative data to qualitative results<br>
+  + Look for external/public data that can either confirm or refute initial findings<br>
+
+**9. Identify conclusions and findings<br>**
+
+## Summary <br>
+TBD<br>
+
+
+<!--chapter:end:03-method.Rmd-->
+
+# Results
+
+This chapter will eventually describe the results of the study.
+
+```{r load-packages ch 4, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+library(remotes)
+library(haven)
+library(jose)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(surveydata)
+library(kableExtra)
+library(openssl)
+library(tidytext)
+library(DT)
+library(janitor)
+library(assertthat)
+library(xaringanExtra)
+library(utf8)
+library(easyGgplot2)
+library(RCurl)
+library(jsonlite)
+library(dplyr)
+library(epiDisplay)
+library(gtsummary)
+library(tidyverse)
+library(urbnmapr)
+library(stringr)
+library(plyr)
+library(readxl)
+```
+
+```{r read in chapter 4 data and clean, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+#Set Working Directory
+setwd("/Users/allisonkunerth/Desktop/Dissertation")
+#Read in Surveillance Survey Data
+SS_Data <- data.frame(read.csv('/Users/allisonkunerth/Desktop/Dissertation/Data/Surveillance_Survey_2.csv'))
+
+#Remove unnecessary columns
+SS_Data <- subset(SS_Data, select = -c(3:10))
+#Remove unnecessary rows
+SS_Data <- SS_Data %>% slice(-c(1,2))
+
+library(gtsummary)
+Employment <- SS_Data %>%
+      dplyr::select(SS.005:SS.008)
+User <- SS_Data %>%
+      dplyr::select(SS.009)
+```
+
+```{r Respondent Data, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+#Remove incomplete responses
+SS_Data <- SS_Data %>% slice(-c(1,14,15, 26, 37))
+#Calculate Average Response Time
+SS_Data$TimetoComplete <- with(SS_Data, difftime(SS_Data$EndDate,SS_Data$StartDate,units="mins") )
+RT <- data.frame("start" = SS_Data$StartDate, "end" = SS_Data$EndDate, "TotalTime" = SS_Data$TimetoComplete)
+RT_Mean <- mean(RT$TotalTime)
+RT_Mean <- round(RT_Mean, 2)
+#Remove outliers for time calculation
+RT2 <- RT %>% slice(-c(5,9, 11, 16, 33, 40))
+RT_Mean2 <- mean(RT2$TotalTime)
+RT_Mean2 <- round(RT_Mean2, 2)
+#Number of Responses
+Responses <- nrow(SS_Data)
+Min <- min(RT2$TotalTime)
+Min <- round(Min, 2)
+Max <- max(RT2$TotalTime)
+Max <- round(Max, 2)
+```
+
+### Responses
+
+``` {r Responses Map, echo = FALSE, message=FALSE, warning= FALSE}
+#Recode Agency to County
+library(stringr)
+SS_Data$Counties <- word(SS_Data$SS.006, 1)
+#Add word county 
+SS_Data$Counties=paste0(SS_Data$Counties," County")
+
+#Recode OHA from counties
+SS_Data$county_name <- revalue(SS_Data$Counties, c("Oregon County"="OHA"))
+
+#Create basemap of Oregon with counties                               
+Oregon_Map <- get_urbn_map(map = "counties", sf = TRUE) %>%
+   filter(state_name == "Oregon")
+
+ResponsesByCounty <- SS_Data %>% 
+  add_count(county_name)
+
+ResponseData <- data.frame("county_name" = ResponsesByCounty$county_name, "n" = ResponsesByCounty$n)
+ResponseData <- ResponseData %>% distinct(county_name, n)
+
+ResponseMap <- Oregon_Map %>%
+  left_join(ResponseData, by = "county_name") %>% 
+  ggplot() +
+  geom_sf(mapping = aes(fill = n),
+          color = "#ffffff", size = 0.25) +
+  scale_fill_gradient() +
+  labs(fill = "Completed Surveys") +
+  coord_sf(datum = NA)
+
+
+```
+
+``` {r Interview Map, echo = FALSE, message=FALSE, warning= FALSE}
+#Read in MasterList
+#Set Working Directory
+setwd("/Users/allisonkunerth/Desktop/Dissertation")
+#Read in Surveillance Survey Data
+Interviews <- data.frame(read_xlsx('/Users/allisonkunerth/Desktop/Dissertation/Data/Masterlist.xlsx'))
+#Remove unnecessary rows
+#Interviews <- Interviews %>% slice(-c(1))
+
+#Create basemap of Oregon with counties                               
+Oregon_Map <- get_urbn_map(map = "counties", sf = TRUE) %>%
+   filter(state_name == "Oregon")
+
+InterviewsByCounty <- Interviews %>% 
+  add_count(County)
+#Add word county 
+InterviewsByCounty$County=paste0(InterviewsByCounty$County," County")
+
+InterviewData <- data.frame("county_name" = InterviewsByCounty$County, "n" = InterviewsByCounty$n)
+InterviewData <- InterviewData %>% distinct(county_name, n)
+
+InterviewMap <- Oregon_Map %>%
+  left_join(InterviewData, by = "county_name") %>% 
+  ggplot() +
+  geom_sf(mapping = aes(fill = n),
+          color = "#ffffff", size = 0.25) +
+  scale_fill_gradient() +
+  labs(fill = "Completed Interviews") +
+  coord_sf(datum = NA)
+```
+
+**Total Survey Responses**
+```{r Respondent Maps, echo = FALSE, message=FALSE, warning=FALSE}
+ResponseMap
+```
+
+|  Total Responses: `r Responses` | Time (Minutes) |
+| :---                  |            ---:|
+| Mean Response Time    | `r RT_Mean2`   |
+| Minimum Response Time | `r Min`        |
+| Maximum Response Time | `r Max`        |
+
+
+**Total Interview Responses** 
+```{r Interview Maps, echo = FALSE, message=FALSE, warning=FALSE}
+InterviewMap
+```
+
+**Total Completed Interview Responses by County (includes OHA and Other) and User-Type** <br> {#InterviewResponses}
+``` {r Interview Table, echo = FALSE, message=FALSE, warning= FALSE}
+datatable(Interviews)
+```
+
+<!--chapter:end:04-results.Rmd-->
+
+# Discussion
+
+TBD
+
+<!--chapter:end:05-discussion.Rmd-->
+
+# (APPENDIX) Appendices {-} 
+
+# Appendix A {-} 
+
+## Full Survey Results {#SurveyResults}
+
+```{r load-packages ch 6, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+library(remotes)
+library(haven)
+library(jose)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(surveydata)
+library(kableExtra)
+library(openssl)
+library(tidytext)
+library(DT)
+library(janitor)
+library(assertthat)
+library(xaringanExtra)
+library(utf8)
+library(easyGgplot2)
+library(RCurl)
+library(jsonlite)
+library(dplyr)
+library(epiDisplay)
+library(gtsummary)
+library(tidyverse)
+library(urbnmapr)
+library(stringr)
+library(plyr)
+library(readxl)
+```
+
+```{r read in chapter 6 data and clean, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+#Set Working Directory
+setwd("/Users/allisonkunerth/Desktop/Dissertation")
+#Read in Surveillance Survey Data
+SS_Data <- data.frame(read.csv('/Users/allisonkunerth/Desktop/Dissertation/Data/Surveillance_Survey_2.csv'))
+
+#Remove unnecessary columns
+SS_Data <- subset(SS_Data, select = -c(3:10))
+#Remove unnecessary rows
+SS_Data <- SS_Data %>% slice(-c(1,2))
+
+library(gtsummary)
+Employment <- SS_Data %>%
+      dplyr::select(SS.005:SS.008)
+User <- SS_Data %>%
+      dplyr::select(SS.009)
+
+Interview <- SS_Data %>%
+      dplyr::select(SS.042:SS.043)
+```
+
+```{r Respondent Data ch 6, echo=FALSE, warning=FALSE, include=FALSE, message = FALSE}
+#Remove incomplete responses
+SS_Data <- SS_Data %>% slice(-c(1,14,15, 26, 37))
+#Calculate Average Response Time
+SS_Data$TimetoComplete <- with(SS_Data, difftime(SS_Data$EndDate,SS_Data$StartDate,units="mins") )
+RT <- data.frame("start" = SS_Data$StartDate, "end" = SS_Data$EndDate, "TotalTime" = SS_Data$TimetoComplete)
+RT_Mean <- mean(RT$TotalTime)
+RT_Mean <- round(RT_Mean, 2)
+#Remove outliers for time calculation
+RT2 <- RT %>% slice(-c(5,9, 11, 16, 33, 40))
+RT_Mean2 <- mean(RT2$TotalTime)
+RT_Mean2 <- round(RT_Mean2, 2)
+#Number of Responses
+Responses <- nrow(SS_Data)
+Min <- min(RT2$TotalTime)
+Min <- round(Min, 2)
+Max <- max(RT2$TotalTime)
+Max <- round(Max, 2)
+```
+
+**Total Survey Responses by County (includes OHA and Other)**
+``` {r Plot Responses Map ch 6, echo = FALSE,  message=FALSE, warning= FALSE}
+datatable(ResponseData)
+```
+
+### Recruitment {#Recruitment}
+
+How did you hear about this study?
+``` {r SS005 table, echo = FALSE, message=FALSE, warning= FALSE}
+Employment %>%
+  select(SS.005) %>%
+  mutate(SS.005 = na_if(SS.005, "")) %>%
+tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+### Employment Block {#Employment}
+
+What department do you work in?
+``` {r SS007 table, echo = FALSE, message=FALSE, warning= FALSE}
+Employment %>%
+  select(SS.007) %>%
+  mutate(SS.007 = na_if(SS.007, "")) %>%
+tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+```{r SS008, echo = FALSE, message=FALSE, warning=FALSE, results=FALSE}
+#Create SS008 Position Titles Cloud
+SS008 <- Employment %>%
+  group_by(SS.008) %>%
+  select(SS.008)
+
+SS008.1 <-Corpus(VectorSource(SS008))
+inspect(SS008.1)
+toSpace <- content_transformer(function (x, pattern ) gsub(pattern, " ", x))
+SS008.1 <-tm_map(SS008.1, toSpace, "/")
+SS008.1 <-tm_map(SS008.1, toSpace, "@")
+SS008.1 <-tm_map(SS008.1, toSpace, "\\|")
+SS008.1 <-tm_map(SS008.1, toSpace, ",")
+SS008.1 <-tm_map(SS008.1, toSpace, "II")
+SS008.1 <- tm_map(SS008.1, content_transformer(tolower))
+SS008.1 <- tm_map(SS008.1, (removeNumbers))
+SS008.1 <- tm_map(SS008.1, removeWords, stopwords("english"))
+SS008.1 <- tm_map(SS008.1, (removePunctuation))
+
+dtm <- TermDocumentMatrix(SS008.1)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m), decreasing = TRUE)
+d <- data.frame(word = names(v), freq=v)
+```
+
+What is your current job title? {#SS.008}
+```{r SS008 wordcloud, echo = FALSE, message=FALSE, warning=FALSE}
+set.seed(1234)
+SS008.2 <- wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words = 200, random.order = FALSE, rot.per=0.15,
+          colors=brewer.pal(8,"Dark2"))
+```
+
+### User-Type Block {#User-Type}
+Which of the following surveillance systems have you received information from (i.e., reports), accessed and/or used as a part of your assigned duties when employed by state or local county governments in Oregon? This does not include Arias or other contact-tracing systems.
+```{r User Type Block, echo = FALSE, message=FALSE, warning=FALSE}
+#Create User type table
+User %>%
+  mutate(SS.009 = na_if(SS.009, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+### ESSENCE Block {#ESSENCE-Block}
+
+How frequently did you use ESSENCE?
+```{r SS.010, echo = FALSE, message=FALSE, warning=FALSE}
+SS_Data %>%
+ select(SS.010) %>%
+  mutate(SS.010 = na_if(SS.010, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+Please indicate if you have ever used ESSENCE data for any of the following events and purposes.<br><br>
+
+<br>Emerging infectious diseases (ex. COVID, unknown/novel diseases)<br>
+```{r SS.011_1, echo = FALSE, message=FALSE, warning=FALSE}
+
+SS_Data %>%
+ select(SS.011_1) %>%
+  mutate(SS.011_1 = na_if(SS.011_1, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+<br>Disease outbreaks of known diseases (ex., Measles, Pertussis)<br>
+```{r SS.011_2, echo = FALSE, message=FALSE, warning=FALSE}
+
+SS_Data %>%
+ select(SS.011_2) %>%
+  mutate(SS.011_2 = na_if(SS.011_2, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+<br>Chronic Disease (ex. TB, HIV) <br>
+```{r SS.011_3, echo = FALSE, message=FALSE, warning=FALSE}
+
+SS_Data %>%
+ select(SS.011_3) %>%
+  mutate(SS.011_3 = na_if(SS.011_3, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+<br>Injuries (ex. Drownings, drug overdoses) <br>
+```{r SS.011_4, echo = FALSE, message=FALSE, warning=FALSE}
+
+SS_Data %>%
+ select(SS.011_4) %>%
+  mutate(SS.011_4 = na_if(SS.011_4, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+<br>Mass or public gatherings (ex. Athletic events, concerts, school sporting events) <br>
+```{r SS.011_5, echo = FALSE, message=FALSE, warning=FALSE}
+
+SS_Data %>%
+ select(SS.011_5) %>%
+  mutate(SS.011_5 = na_if(SS.011_5, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+<br>Environmental conditions (ex., Air quality, Cold weather)<br>
+```{r SS.011_6, echo = FALSE, message=FALSE, warning=FALSE}
+
+SS_Data %>%
+ select(SS.011_6) %>%
+  mutate(SS.011_6 = na_if(SS.011_6, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+<br>Natural Disasters (ex. Fires, earthquakes)<br>
+```{r SS.011_7, echo = FALSE, message=FALSE, warning=FALSE}
+
+SS_Data %>%
+ select(SS.011_7) %>%
+  mutate(SS.011_7 = na_if(SS.011_7, "")) %>%
+  tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+
+```{r SS012, echo = FALSE, message=FALSE, warning=FALSE, results=FALSE}
+#Create SS012 Position Titles Cloud
+SS012 <- SS_Data %>%
+  group_by(SS.012) %>%
+  select(SS.012)
+
+SS012.1 <-Corpus(VectorSource(SS012))
+toSpace <- content_transformer(function (x, pattern ) gsub(pattern, " ", x))
+SS012.1 <-tm_map(SS012.1, toSpace, "/")
+SS012.1 <-tm_map(SS012.1, toSpace, "@")
+SS012.1 <-tm_map(SS012.1, toSpace, "\\|")
+SS012.1 <-tm_map(SS012.1, toSpace, ",")
+SS012.1 <-tm_map(SS012.1, toSpace, "II")
+SS012.1 <- tm_map(SS012.1, content_transformer(tolower))
+SS012.1 <- tm_map(SS012.1, (removeNumbers))
+SS012.1 <- tm_map(SS012.1, removeWords, stopwords("english"))
+SS012.1 <- tm_map(SS012.1, (removePunctuation))
+
+dtm <- TermDocumentMatrix(SS012.1)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m), decreasing = TRUE)
+d <- data.frame(word = names(v), freq=v)
+```
+
+<br>Can you please describe why you used ESSENCE data (when applicable) for the purposes mentioned above?<br>
+```{r SS012 wordcloud, echo = FALSE, message=FALSE, warning=FALSE}
+set.seed(1234)
+SS012.2 <- wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words = 200, random.order = FALSE, rot.per=0.15,
+          colors=brewer.pal(8,"Dark2"))
+```
+
+```{r SS013, echo = FALSE, message=FALSE, warning=FALSE, results=FALSE}
+#Create SS013 Position Titles Cloud
+SS013 <- SS_Data %>%
+  group_by(SS.013) %>%
+  select(SS.013)
+
+SS013.1 <-Corpus(VectorSource(SS013))
+toSpace <- content_transformer(function (x, pattern ) gsub(pattern, " ", x))
+SS013.1 <-tm_map(SS013.1, toSpace, "/")
+SS013.1 <-tm_map(SS013.1, toSpace, "@")
+SS013.1 <-tm_map(SS013.1, toSpace, "\\|")
+SS013.1 <-tm_map(SS013.1, toSpace, ",")
+SS013.1 <-tm_map(SS013.1, toSpace, "II")
+SS013.1 <- tm_map(SS013.1, content_transformer(tolower))
+SS013.1 <- tm_map(SS013.1, (removeNumbers))
+SS013.1 <- tm_map(SS013.1, removeWords, stopwords("english"))
+SS013.1 <- tm_map(SS013.1, (removePunctuation))
+
+dtm <- TermDocumentMatrix(SS013.1)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m), decreasing = TRUE)
+d <- data.frame(word = names(v), freq=v)
+```
+
+<br>Can you please describe why you did not use ESSENCE data (when applicable) for the purposes mentioned above?<br>
+```{r SS013 wordcloud, echo = FALSE, message=FALSE, warning=FALSE}
+set.seed(1234)
+SS013.2 <- wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words = 200, random.order = FALSE, rot.per=0.15,
+          colors=brewer.pal(8,"Dark2"))
+```
+
+
+
+```{r NonESSENCE Block, echo = FALSE, message=FALSE, warning=FALSE}
+#Create Employment table
+library(gtsummary)
+NonESSENCE <- SS_Data %>%
+      dplyr::select(SS.018_1:Q29)
+NonESSENCE <- tbl_summary(NonESSENCE) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+
+### Non-ESSENCE Block {#NonEssence}
+`r NonESSENCE`
+
+```{r Other Users Block, echo = FALSE, message=FALSE, warning=FALSE}
+#Create Employment table
+library(gtsummary)
+Other <- SS_Data %>%
+      dplyr::select(SS.035:SS.037)
+Other <- tbl_summary(Other) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+### Other Users Block {#OtherUsers}
+`r Other`
+
+```{r Other Factors Block, echo = FALSE, message=FALSE, warning=FALSE}
+#Create Employment table
+library(gtsummary)
+Factors <- SS_Data %>%
+      dplyr::select(SS.030_1:SS.033_4)
+Factors <- tbl_summary(Factors) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+### Other Factors Block {#OtherFactors}
+`r Factors`
+
+```{r Demographics Block, echo = FALSE, message=FALSE, warning=FALSE}
+#Create Employment table
+library(gtsummary)
+Demo <- SS_Data %>%
+      dplyr::select(SS.038:SS.041)
+Demo <- tbl_summary(Demo) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+
+```
+
+### Demographics Block {#Demographics}
+`r Demo`
+
+### Interview Interest Block {#InterviewInterestBlock}
+
+Are you interested in receiving a copy of the findings and results from this study?<br> {#SS.042}
+```{r SS.042, echo = FALSE, message=FALSE, warning=FALSE}
+Interview %>%
+  select(SS.042) %>%
+tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+```
+
+Please indicate whether you would be willing to participate in a short interview (approximately 15-20 minutes) to help provide more context and details about the use of surveillance data in Oregon.<br> {#SS.043}
+```{r SS.043, echo = FALSE, message=FALSE, warning=FALSE}
+Interview %>%
+  select(SS.043) %>%
+  mutate(SS.043 = na_if(SS.043, "")) %>%
+tbl_summary(
+  missing = "always", missing_text = "Missing"
+  ) %>%
+  add_n() %>% #adds column with total number of non-missing observations
+  modify_header(label = "**Item**") %>% # updates the column header
+  bold_labels()
+```
+
+
+# Appendix B {-} 
+
+This will be Appendix B.
+
+# Vita Auctoris {-} 
+
+TBD
+
+# Bibliography  {-} 
+
+<!--chapter:end:06-references.Rmd-->
+
